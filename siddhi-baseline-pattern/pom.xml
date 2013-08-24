@@ -1,0 +1,45 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org</groupId>
+	<artifactId>siddhi-baseline-pattern</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.wso2.siddhi</groupId>
+			<artifactId>siddhi-api</artifactId>
+			<version>2.0.0-wso2v1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.wso2.siddhi</groupId>
+			<artifactId>siddhi-core</artifactId>
+			<version>2.0.0-wso2v1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.wso2.siddhi</groupId>
+			<artifactId>siddhi-query</artifactId>
+			<version>2.0.0-wso2v1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.2.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.2.2</version>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>wso2-maven2-repository</id>
+			<name>WSO2 Maven2 Repository</name>
+			<url>http://dist.wso2.org/maven2</url>
+		</repository>
+	</repositories>
+</project>
