@@ -151,7 +151,6 @@ public class Main {
 						+ "ms, including log parsing: "
 						+ (millisAfterSend - millisOnStart) + "ms.");
 		
-		// manual shutdown
-		System.exit(0);
+		siddhiManager.shutdown();
 	}
 }
