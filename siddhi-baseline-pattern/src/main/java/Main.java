@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.wso2.siddhi.core.SiddhiManager;
@@ -16,10 +13,27 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 public class Main {
 
 	/**
-	 * Log file used if not supplied as a command-line parameter
+	 * True if by default the events should be read from socket, false to read
+	 * events from file
 	 */
-	private static final String LOG_PATH = "C:\\Users\\Svata\\AppData\\Local\\Temp\\jel.log";
+	private static final boolean useSocket = true;
+
+	private static final String DEFAULT_LOG_PATH = "C:\\Users\\Svata\\AppData\\Local\\Temp\\jel.log";
+	private static final String DEFAULT_HOST = "localhost";
+	private static final int DEFAULT_PORT = 4747;
+
 	private static int distributedAttackCount = 0;
+
+	private static void showUsage() {
+		System.out.println("Usage:");
+		System.out.println("0, 1 or 2 parameters can be passed");
+		System.out.println("If no parameter is passed, default values "
+				+ "(specified in the code) are used");
+		System.out.println("If one parameter is passed, it is interpreted "
+				+ "as a log file name");
+		System.out.println("If two parameters are passed, the first is "
+				+ "interpreted as a host name, the second as a port number");
+	}
 
 	private static EventToSend convertEvent(MyEvent event) {
 		String type = event.getType();
@@ -41,8 +55,33 @@ public class Main {
 	}
 
 	public static void main(String[] args) throws InterruptedException {
-		// log file can be supplied as a command-line parameter
-		String logFileUsed = args.length > 0 ? args[0] : LOG_PATH;
+
+		EventSource eventSource = null;
+
+		switch (args.length) {
+		case 0:
+			eventSource = useSocket ? new EventSource(DEFAULT_HOST,
+					DEFAULT_PORT) : new EventSource(DEFAULT_LOG_PATH);
+			break;
+		case 1:
+			// use specified file
+			eventSource = new EventSource(args[0]);
+			break;
+		case 2:
+			try {
+				// use socket = host + port
+				int port = Integer.parseInt(args[1]);
+				eventSource = new EventSource(args[0], port);
+			} catch (NumberFormatException e) {
+				showUsage();
+				return;
+			}
+		default:
+			showUsage();
+			return;
+		}
+
+		System.out.println(eventSource.getInfo());
 
 		System.out.println("Loading log...");
 		long millisOnStart = System.currentTimeMillis();
@@ -56,12 +95,11 @@ public class Main {
 		ArrayList<EventToSend> events = new ArrayList<EventToSend>();
 
 		try {
-			FileInputStream fstream = new FileInputStream(logFileUsed);
-			DataInputStream in = new DataInputStream(fstream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
 
-			while ((strLine = br.readLine()) != null) {
+			eventSource.open();
+
+			while ((strLine = eventSource.readLine()) != null) {
 				strLine = strLine.trim();
 				if (strLine.isEmpty())
 					continue;
@@ -73,10 +111,15 @@ public class Main {
 				if (convertedEvent != null)
 					events.add(convertedEvent);
 			}
-			in.close();
 		} catch (Exception e) {// Catch exception if any
 			System.err.println("Error: " + e.getMessage());
 			System.exit(-1);
+		} finally {
+			if (eventSource != null)
+				try {
+					eventSource.close();
+				} catch (IOException e) {
+				}
 		}
 
 		System.out.println("Log loaded");
@@ -150,7 +193,8 @@ public class Main {
 						+ (millisAfterSend - millisAfterLoad)
 						+ "ms, including log parsing: "
 						+ (millisAfterSend - millisOnStart) + "ms.");
-		
+
 		siddhiManager.shutdown();
+
 	}
 }
