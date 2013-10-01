@@ -82,3 +82,9 @@ MANIFEST.MF
 
 # Log files
 *.log
+
+# Erlide
+
+*.lck
+*.dump
+
