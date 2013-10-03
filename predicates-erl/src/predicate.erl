@@ -20,14 +20,14 @@
 %% A predicate record represents a list of disjunctions and is evaluated
 %% as a conjunction of these disjunctions
 
--record(disjunction, {elements=[]}).
--record(predicate, {disjunctions=[]}).
+-record(clause, {literals =[]}).
+-record(predicate, {clauses =[]}).
 
-createPredicate(Disjunctions) when is_list(Disjunctions) ->
-	#predicate{disjunctions=Disjunctions}.
+createPredicate(Clauses) when is_list(Clauses) ->
+	#predicate{clauses =Clauses}.
 
-createDisjunction(Elements) when is_list(Elements) ->
-	#disjunction{elements=Elements}.
+createDisjunction(Literals) when is_list(Literals) ->
+	#clause{literals =Literals}.
 
 createElement(Function, ArgumentList) ->
 	{Function, ArgumentList}.
@@ -66,12 +66,12 @@ evalElement(Element, Events) when is_tuple(Element) ->
 evalElement(Element, _) ->
 	Element.
 
-evalDisjunction(Disjunction, Events) when is_record(Disjunction, disjunction),
+evalDisjunction(Clause, Events) when is_record(Clause, clause),
 										  is_list(Events) ->
-	ElementList = Disjunction#disjunction.elements,
+	ElementList = Clause#clause.literals,
 	lists:any(fun(Element) -> evalElement(Element, Events) end, ElementList).
 
 evalPredicate(Predicate, Events) when is_record(Predicate, predicate),
 									  is_list(Events) ->
-	DisjunctionList = Predicate#predicate.disjunctions,
-	lists:all(fun(Disjunction) -> evalDisjunction(Disjunction, Events) end, DisjunctionList).
+	Clauses = Predicate#predicate.clauses,
+	lists:all(fun(Clause) -> evalDisjunction(Clause, Events) end, Clauses).

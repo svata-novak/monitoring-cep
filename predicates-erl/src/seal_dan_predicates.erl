@@ -9,21 +9,21 @@
 -module(seal_dan_predicates).
 -author("xtovarn").
 
--record(clause, {terms = []}).
--record(predicate, {disjunctions = []}).
+-record(clause, {literals = []}).
+-record(predicate, {clauses = []}).
 
 %% API
 -export([eval/2]).
 
 eval(Predicate = #predicate{}, Events) ->
-	lists:all(fun(Disjunction = #clause{}) -> eval(Disjunction, Events) end, Predicate#predicate.disjunctions);
+	lists:all(fun(Clauses = #clause{}) -> eval(Clauses, Events) end, Predicate#predicate.clauses);
 eval(Clause = #clause{}, Events) ->
 	lists:any(
 		fun(Literal) ->
 			{Fun, Args} = Literal,
 			seal_boolfuns:Fun(args(Args, Events))
 		end,
-		Clause#clause.terms).
+		Clause#clause.literals).
 
 args([First, Second], Events) ->
 	{arg(First, Events), arg(Second, Events)}.

@@ -45,7 +45,7 @@ benchmark() ->
 		lists:foreach(fun(Event1) ->
 			lists:foreach(fun(Event2) ->
 				%%io:format("~w ", [predicate:evalPredicate(Predicate, [Event1, Event2])])
-				seal_dan_predicates:eval(Predicate, [Event1, Event2])
+				predicate:evalPredicate(Predicate, [Event1, Event2])
 			end, EventList)
 		end, EventList)
 	end),
