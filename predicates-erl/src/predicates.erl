@@ -28,25 +28,7 @@ get_time_diff({BeforeMeS, BeforeS, BeforeMiS}, {AfterMeS, AfterS, AfterMiS}) ->
 divide_time_diff({MeS, S, MiS}, Divisor) ->
 	{MeS / Divisor, S / Divisor, MiS / Divisor}.
 
-main() ->
-	io:format("Hello world!~n"),
-	%%predicate:test(),
-	%%EmptyDict = orddict:new(),
-	%%Event = orddict:store("id", 1, EmptyDict),
-
-	%%EmptyEvent = event:create(),
-	%%Event1 = event:store(EmptyEvent, "id", 1),
-	%%Event2 = event:store(EmptyEvent, "id", 1),
-	
-	%%functions:projection(Event, "id")
-	%%ok.
-
-	%%Elem = {fun functions:equals/2,
-	%%		{fun functions:projection/2, {event, 1}, "id"},
-	%%		{fun functions:projection/2, {event, 2}, "id"}},
-	%%Disj = #disjunction{elements=[Elem]},
-	%%Predicate = #predicate{inputEventCount=2, disjunctions=[Disj]},
-
+benchmark() ->
 	Event1 = event:create([{"id", 1}, {"attr1", 1}, {"attr2", 1}]),
 	Event2 = event:create([{"id", 1}, {"attr1", 2}, {"attr2", 2}]),
 	Event3 = event:create([{"id", 2}, {"attr1", 1}, {"attr2", 1}]),
@@ -55,8 +37,6 @@ main() ->
 	EventList = [Event1, Event2, Event3, Event4],
 	
 	Predicate = get_predicate2(),
-	
-	%%lists:foreach(fun(Event) -> io:format("~w ", [predicate:evalPredicate(Predicate, [Event, Event])]) end, EventList),
 
 	Before = os:timestamp(),
 	io:format("~nTimestamp before: ~w~n", [Before]),
@@ -76,7 +56,7 @@ main() ->
 	TimeDiff = get_time_diff(Before, After),
 	io:format("~nElapsed time (~B matches): ~w~n", [MatchesCount, TimeDiff]),
 	%%io:format("~nOne match: ~w~n", [divide_time_diff(TimeDiff, MatchesCount)]),
-	
-	%%predicate:evalPredicate(Predicate, [Event1, Event2]).
-	
 	ok.
+
+main() ->
+	benchmark().

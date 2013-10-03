@@ -31,33 +31,19 @@ createDisjunction(Elements) when is_list(Elements) ->
 createElement(Function, FirstArgument, SecondArgument) ->
 	{Function, FirstArgument, SecondArgument}.
 
-%%evalTerm(Term) ->
-%%	case is_tuple(Term) of
-%%		true -> evalElement(Term);
-%%		false -> Term
-%%	end.
-
 evalElement({event, EventNumber}, Events) ->
 	lists:nth(EventNumber, Events);
 
 evalElement(Element, Events) when is_tuple(Element) ->
 	%% tuple_size(Element) should be 3
 	{Function, FirstTerm, SecondTerm} = Element,
-	%% might be a constant or a function with parameters
-	%%FirstTermValue = case is_tuple(FirstTerm) of
-	%%					 true -> evalElement(FirstTerm);
-	%%					 false -> FirstTerm
-	%%					end,
+
 	FirstTermValue = evalElement(FirstTerm, Events),
 	SecondTermValue = evalElement(SecondTerm, Events),
 	functions:Function(FirstTermValue, SecondTermValue);
 
 evalElement(Element, _) ->
 	Element.
-
-%%eval(disjunctions, Disjunctions) when is_list(Disjunctions) ->
-	%%lists:any(Pred, List)
-	%%ok.
 
 evalDisjunction(Disjunction, Events) when is_record(Disjunction, disjunction),
 										  is_list(Events) ->
@@ -67,6 +53,5 @@ evalDisjunction(Disjunction, Events) when is_record(Disjunction, disjunction),
 
 evalPredicate(Predicate, Events) when is_record(Predicate, predicate),
 									  is_list(Events) ->
-	%%lists:all(fun evalDisjunction/1, Predicate).
 	DisjunctionList = Predicate#predicate.disjunctions,
 	lists:all(fun(Disjunction) -> evalDisjunction(Disjunction, Events) end, DisjunctionList).
