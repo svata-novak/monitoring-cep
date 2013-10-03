@@ -50,7 +50,7 @@ evalElement(Element, Events) when is_tuple(Element) ->
 	%%					end,
 	FirstTermValue = evalElement(FirstTerm, Events),
 	SecondTermValue = evalElement(SecondTerm, Events),
-	Function(FirstTermValue, SecondTermValue);
+	functions:Function(FirstTermValue, SecondTermValue);
 
 evalElement(Element, _) ->
 	Element.

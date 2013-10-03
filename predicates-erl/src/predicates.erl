@@ -5,25 +5,28 @@
 -define(REPEAT_COUNT, 100000).
 
 get_predicate() ->
-	FirstArg = predicate:createElement(fun functions:projection/2, {event, 1}, "id"),
-	SecondArg = predicate:createElement(fun functions:projection/2, {event, 2}, "id"),
-	Elem = predicate:createElement(fun functions:eq/2, FirstArg, SecondArg),
+	FirstArg = predicate:createElement(projection, {event, 1}, "id"),
+	SecondArg = predicate:createElement(projection, {event, 2}, "id"),
+	Elem = predicate:createElement(eq, FirstArg, SecondArg),
 	
 	Disj = predicate:createDisjunction([Elem]),
 	predicate:createPredicate([Disj]).
 
 get_predicate2() ->
-	Elem1 = predicate:createElement(fun functions:eq/2,
-		predicate:createElement(fun functions:projection/2, {event, 1}, "id"),
-		predicate:createElement(fun functions:projection/2, {event, 2}, "id")),
-	Elem2 = predicate:createElement(fun functions:gt/2,
-		predicate:createElement(fun functions:projection/2, {event, 1}, "attr1"),
-		predicate:createElement(fun functions:projection/2, {event, 2}, "attr2")),
+	Elem1 = predicate:createElement(eq,
+		predicate:createElement(projection, {event, 1}, "id"),
+		predicate:createElement(projection, {event, 2}, "id")),
+	Elem2 = predicate:createElement(gt,
+		predicate:createElement(projection, {event, 1}, "attr1"),
+		predicate:createElement(projection, {event, 2}, "attr2")),
 	predicate:createPredicate([predicate:createDisjunction([Elem1]),
 							   predicate:createDisjunction([Elem2])]).
 
 get_time_diff({BeforeMeS, BeforeS, BeforeMiS}, {AfterMeS, AfterS, AfterMiS}) ->
 	{AfterMeS - BeforeMeS, AfterS - BeforeS, AfterMiS - BeforeMiS}.
+
+divide_time_diff({MeS, S, MiS}, Divisor) ->
+	{MeS / Divisor, S / Divisor, MiS / Divisor}.
 
 main() ->
 	io:format("Hello world!~n"),
@@ -56,7 +59,7 @@ main() ->
 	%%lists:foreach(fun(Event) -> io:format("~w ", [predicate:evalPredicate(Predicate, [Event, Event])]) end, EventList),
 
 	Before = os:timestamp(),
-	io:format("~n~n~n~n~n~w~n~n~n~n~n~n", [Before]),
+	io:format("~nTimestamp before: ~w~n", [Before]),
 	
 	util:for(?REPEAT_COUNT, fun(_) ->
 		lists:foreach(fun(Event1) ->
@@ -68,9 +71,11 @@ main() ->
 	end),
 	
 	After = os:timestamp(),
-	io:format("~n~n~n~n~n~w~n~n~n~n~n~n", [After]),
-	
-	io:format("~n~n~n~n~nElapsed time: ~w~n~n~n~n~n~n", [get_time_diff(Before, After)]),
+	io:format("~nTimestamp after: ~w~n", [After]),
+	MatchesCount = length(EventList) * length(EventList) * ?REPEAT_COUNT,
+	TimeDiff = get_time_diff(Before, After),
+	io:format("~nElapsed time (~B matches): ~w~n", [MatchesCount, TimeDiff]),
+	%%io:format("~nOne match: ~w~n", [divide_time_diff(TimeDiff, MatchesCount)]),
 	
 	%%predicate:evalPredicate(Predicate, [Event1, Event2]).
 	
